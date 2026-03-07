@@ -7,6 +7,7 @@ The goal of Lab 1 is to establish a functional SIEM environment capable of ing
 The Microsoft Defender portal (security.microsoft.com), where Sentinel now resides, was used.
 
 
+
 ## Environment Architecture
 
 Platform: Microsoft Azure
@@ -46,7 +47,7 @@ Microsoft Sentinel was enabled on the Log Analytics Workspace, creating a SIEM t
 The following data connectors were successfully connected and verified:
 
 * Azure Activity
-* Microsoft Entra ID 
+* Microsoft Entra ID
 * Microsoft Defender for Endpoint
 * Microsoft Defender for Identity
 * Microsoft Defender XDR
@@ -55,9 +56,9 @@ The following data connectors were successfully connected and verified:
 
 ## Verification
 
-*   All connectors show as Connected
-*	Sign‑in logs and audit logs confirmed in Log Analytics
-* 	Azure Activity logs successfully ingested
+* All connectors show as Connected
+* Sign‑in logs and audit logs confirmed in Log Analytics
+* Azure Activity logs successfully ingested
 
 ## Step 4 – Content Hub Installation
 
@@ -89,34 +90,51 @@ NB: Templates do not generate incidents until they are converted into active rul
 * Suspicious sign-in behaviour rules
 * Threat intelligence-based rules
 
+
+
+(Currently  resource level diagnostic settings disabled as they are mainly used for Azure resource logs (VMs, Key Vault, Storage, etc.).  Log Analytics Workspace is receiving logs from data connectors e.g. Azure Activity which go to Sentinel.)
+
+
+
 ## Step 6 — Access Control (RBAC)
+
 Role‑based access control was configured to support realistic SOC operations:
+
+
 
 • 	Sentinel Contributor
 • 	Log Analytics Reader
 • 	Security Reader
+
+
 This ensures analysts can investigate incidents without requiring full administrative access.
 
+
+
 ## Step 7 — Workspace Health Validation
+
 KQL queries were used to confirm ingestion health:
+
+
 
 union SigninLogs, AuditLogs, AzureActivity
 | summarize LastEvent=max(TimeGenerated) by Type
 
+
+
 This verifies that all connected data sources are actively sending logs.
 
 
-Currently  resource level diagnostic settings disabled as they are mainly used for Azure resource logs (VMs, Key Vault, Storage, etc.).  Log Analytics Workspace is receiving logs from data connectors e.g. Azure Activity which go to Sentinel.
 
 ## Results
 
 * Enabled detection logic
 * Generated malicious behaviour
 * Caused Sentinel to detect it
+* 
 
 ## Lessons Learned
 
 * Data connectors must be configured before rule templates appear.
 * Content Hub installation is required to populate detection logic.
 * Microsoft Sentinel has transitioned from Azure Portal to Microsoft Defender portal.
-
