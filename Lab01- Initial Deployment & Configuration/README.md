@@ -54,8 +54,15 @@ Installed solutions include:
 
 ## Detection Coverage
 
-146 Analytics Rule Templates available, confirming a properly configured SIEM including:
+146 Analytics Rule Templates available
 
+## Analytical rules configuration
+
+NB Templates need to be configured as rules otherwise no incidents will be triggered
+
+### Rules set up
+
+* Multiple failed sign in attempts
 * Identity-based detections
 * Azure role monitoring
 * MFA anomaly detection
@@ -63,10 +70,19 @@ Installed solutions include:
 * Suspicious sign-in behaviour rules
 * Threat intelligence-based rules
 
+
+Currently  resource level diagnostic settings disabled as they are mainly used for Azure resource logs (VMs, Key Vault, Storage, etc.).  Log Analytics Workspace is receiving logs from data connectors e.g. Azure Activity which go to Sentinel .
+
+## Results
+
+- Enabled detection logic
+- Generated malicious behaviour
+- Caused Sentinel to detect it
+
 ## Lessons Learned
 
-Data connectors must be configured before rule templates appear.
-Content Hub installation is required to populate detection logic.
-Microsoft Sentinel has transitioned from Azure Portal to Microsoft Defender portal.
-Identity-related content is distributed across multiple solutions (Entra ID, Defender for Identity, Defender XDR).
+- Data connectors must be configured before rule templates appear.
+- Content Hub installation is required to populate detection logic.
+- Microsoft Sentinel has transitioned from Azure Portal to Microsoft Defender portal.
+- Identity-related content is distributed across multiple solutions (Entra ID, Defender for Identity, Defender XDR).
 
