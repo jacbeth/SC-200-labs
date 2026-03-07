@@ -100,41 +100,34 @@ NB: Templates do not generate incidents until they are converted into active rul
 
 Role‑based access control was configured to support realistic SOC operations:
 
-
-
 • 	Sentinel Contributor
 • 	Log Analytics Reader
 • 	Security Reader
 
-
 This ensures analysts can investigate incidents without requiring full administrative access.
-
-
 
 ## Step 7 — Workspace Health Validation
 
 KQL queries were used to confirm ingestion health:
 
-
-
 union SigninLogs, AuditLogs, AzureActivity
 | summarize LastEvent=max(TimeGenerated) by Type
 
 
-
 This verifies that all connected data sources are actively sending logs.
-
-
 
 ## Results
 
 * Enabled detection logic
 * Generated malicious behaviour
 * Caused Sentinel to detect it
-* 
+
 
 ## Lessons Learned
 
 * Data connectors must be configured before rule templates appear.
 * Content Hub installation is required to populate detection logic.
-* Microsoft Sentinel has transitioned from Azure Portal to Microsoft Defender portal.
+* Microsoft Sentinel has transitioned from Azure Portal to Microsoft Defender portal. 
+
+This lab establishes the foundational SIEM infrastructure. 
+Subsequent labs will focus on detection engineering, incident investigation, threat hunting, and automated response using Microsoft Sentinel.
