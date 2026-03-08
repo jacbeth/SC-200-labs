@@ -16,7 +16,15 @@ These logs capture operations such as:
 - client IP addresses
 - operation timestamps
 
-This telemetry allows monitoring for suspicious file access patterns such as abnormal download activity or potential data exfiltration. NB $logs is reserved for system log files
+This telemetry allows monitoring for suspicious file access patterns such as abnormal download activity or potential data exfiltration. NB $logs is reserved for system log files.
+
+Below is an example query confirming that StorageBlobLogs are being successfully ingested into the workspace:
+
+StorageBlobLogs
+| sort by TimeGenerated desc
+| take 20
+
+![alt text](image.png)
 
 ### SOC Visibility Improvement
 
