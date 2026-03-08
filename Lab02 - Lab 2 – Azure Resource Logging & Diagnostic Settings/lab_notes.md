@@ -16,7 +16,17 @@ These logs capture operations such as:
 - client IP addresses
 - operation timestamps
 
+### Diagnostic Settings Configuration
+The screenshot below shows the diagnostic setting applied to the Blob service of the storage account, confirming that logs are being forwarded to the LAW‑Security‑labs Log Analytics workspace.
+
+![Blob Diagnostic Setting](./screenshots/2-Diagnostic-setting-configuratinon.png)
+
+
 This telemetry allows monitoring for suspicious file access patterns such as abnormal download activity or potential data exfiltration. NB $logs is reserved for system log files.
+
+The screenshot below shows the diagnostic settings applied to the storage account, confirming that Storage and Blob logging were successfully enabled while other services (Queue, Table, File) remain disabled for this lab.
+
+![Diagnostic Settings](./screenshots/your-image-name.png)
 
 Below is an example query confirming that StorageBlobLogs are being successfully ingested into the workspace:
 
@@ -25,6 +35,8 @@ StorageBlobLogs
 | take 20
 
 ![Log Query Results](./screenshots/4-log-query-results.png)
+
+This output shows recent blob‑related operations such as GetBlobProperties and GetContainerProperties, confirming that StorageBlobLogs are being successfully ingested.
 
 ### SOC Visibility Improvement
 
