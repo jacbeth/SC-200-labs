@@ -2,21 +2,21 @@
 
 ### Purpose of Diagnostic Settings
 
-Many Azure services do not automatically send logs to Microsoft Sentinel. Diagnostic settings act as the pipeline that forwards resource logs into the monitoring environment. Without diagnostic settings enabled, infrastructure activity may not be visible to security analysts.
+Many Azure services do not automatically send logs to Microsoft Sentinel. Diagnostic settings act as the pipeline that forwards resource logs into the monitoring environment. Without diagnostic settings enabled, infrastructure activity may not be visible.
 
-### Types of Logs Collected
+### Log Sources Enabled
 
-Diagnostic settings collect platform logs, which include:
+The following Azure resource logs were configured and forwarded to the Log Analytics Workspace for analysis within Microsoft Sentinel: Azure Storage Blob service logs (StorageBlobLogs)
 
-* Administrative operations
-* Policy changes
-* Resource configuration modifications
-* Security-related events
+These logs capture operations such as:
 
+- blob uploads
+- blob downloads
+- blob deletions
+- client IP addresses
+- operation timestamps
 
-These logs help identify suspicious administrative activity or misconfigurations.
-
-NB $logs is reserved for system log files
+This telemetry allows monitoring for suspicious file access patterns such as abnormal download activity or potential data exfiltration. NB $logs is reserved for system log files
 
 ### SOC Visibility Improvement
 
@@ -24,7 +24,7 @@ After enabling diagnostic settings, the SIEM environment now ingests:
 
 * Identity logs
 * Azure Activity logs
-* Infrastructure resource logs
+* Resource logs
 
 This significantly improves the detection capabilities of the SOC environment.
 
@@ -34,10 +34,10 @@ The following Kusto Query Language query was used to detect potential abnormal d
 StorageBlobLogs
 | where OperationName == "GetBlob"
 | summarize DownloadCount = count() by CallerIpAddress, bin(TimeGenerated, 15m)
-| where DownloadCount > 5
+| where DownloadCount > 2
 | sort by DownloadCount desc
 
-This query identifies possible data exfiltration attempts by detecting large numbers of file downloads from a single IP address.
+This query identifies possible data exfiltration attempts by detecting numbers of file downloads from a single IP address (DownloadCount would be higher in real world environment).
 
 ### Operational Considerations
 
