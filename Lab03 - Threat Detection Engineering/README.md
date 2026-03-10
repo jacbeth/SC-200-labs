@@ -97,7 +97,7 @@ by CallerIpAddress, bin(TimeGenerated, 1h)
 
 ### Explanation
 
-SAS tokens bypass normal authentication controls. Unexpected SAS usage is a high‑fidelity indicator of compromise.
+Shared Access Signature (SAS) tokens give time limited and permission scoped access to resources in an Azure Storage account without exposing the storage account's access keys. Unexpected SAS usage is a high‑fidelity indicator of compromise.
 
 ### MITRE ATT\&CK - Tactic: Defense Evasion (TA0005)
 
