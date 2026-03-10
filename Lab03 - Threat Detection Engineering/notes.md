@@ -1,6 +1,6 @@
 # Lab 3 — Threat Detection Notes
 
-These notes document the full execution of Lab 3, including screenshots, observations, and commentary. They serve as evidence of hands on work and reinforce understanding of Azure Storage threat detection.
+These notes document the execution of Lab 3, including screenshots, observations, and commentary. T
 
 ## Environment Setup & Log Generation
 
@@ -42,10 +42,11 @@ Microsoft Sentinel → Logs, left side panel shows every table currently availab
 Both tables appear in the workspace: StorageBlobLogs and AzureActivity. This validates that the environment is ready for detection engineering.
 
 ## 🔍 Detection 1 — Repeated Blob Downloads from the Same IP
-Summary
+### Summary
 Detects repeated blob downloads from the same IP address within a 15‑minute window. High‑frequency access may indicate automation, credential misuse, or early‑stage data exfiltration.
 
 KQL Query:
+
 StorageBlobLogs
 | where OperationName == "GetBlob"
 | summarize DownloadCount = count() by CallerIpAddress, bin(TimeGenerated, 15m)
@@ -65,20 +66,21 @@ Query execution/results
 
 
 #### Findings
-IPs exceeded threshold 92.40.169.163. This was expected as the result of simulated attac.
+IPs exceeded threshold 92.40.169.163. This was expected as the result of simulated attack.
 
 #### Commentary
 A sudden spike in blob downloads is a classic early indicator of data harvesting. Attackers often begin by quietly pulling data before escalating. 
 
 MITRE Mapping
-Tactic	Technique
+Tactic              	Technique
 Exfiltration (TA0010)	Exfiltration Over Web Services (T1567)
 
 ## 🔍 Detection 2 — Blob Access from Unusual or Non‑Corporate IP Ranges
-Summary
+### Summary
 Detects blob access originating from IP addresses outside expected private or corporate ranges.
 
 KQL Query:
+
 StorageBlobLogs
 | where OperationName == "GetBlob"
 | where CallerIpAddress !startswith "192.168."
@@ -88,32 +90,30 @@ StorageBlobLogs
 | where AccessCount > 0
 
 #### Explanation
-Filters for blob downloads
-Excludes RFC1918 private IP ranges
-Groups access by IP per hour
-Surfaces any external IP performing blob access
+- Filters for blob downloads
+- Excludes RFC1918 private IP ranges
+- Groups access by IP per hour
+- Surfaces any external IP performing blob access
 
 #### Execution Evidence
 
-![description](./screenshots/filename.png)
+![detection2](./screenshots/5-detection2-query-results)
 
-Query execution
-
-Results showing external IPs
 
 #### Findings
-Document which external IPs accessed blobs and whether the access was expected or authorised.
+External IPs accessed blobs - 92.40.169.164 and 195.149.13.240
+Results were as expected and triggerd by blob access multiple times on my home network
 
 #### Commentary
 Unexpected IPs are a strong indicator of credential compromise, SAS token leakage, or external reconnaissance. This detection becomes extremely powerful when enriched with geo‑location or threat intelligence feeds.
 
 MITRE Mapping
-Tactic	Technique
+Tactic	                Technique
 Initial Access (TA0001)	Valid Accounts (T1078)
 
 
 ## 🔍 Detection 3 — Blob Access Using SAS Tokens
-Summary
+### Summary
 Identifies blob access authenticated using SAS tokens. SAS tokens are high‑risk if leaked because they grant scoped access without requiring credentials.
 
 KQL Query:
