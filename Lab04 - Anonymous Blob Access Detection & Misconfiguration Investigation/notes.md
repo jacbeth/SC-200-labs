@@ -9,80 +9,71 @@ Important: Public access is a common real‑world misconfiguration that exposes 
 
 ### Anonymous Access Testing
 
-Copied the blob URL directly from the Azure portal.
+- Copied the blob URL directly from the Azure portal.
+- Opened a private/incognito browser window.
+- Accessed the blob successfully without authentication, confirming the container was publicly accessible.
+- Refreshed the blob multiple times to generate repeated anonymous read events.
+- Observation: Anonymous access does not require SAS tokens, keys, or Azure AD credentials.
 
-Opened a private/incognito browser window.
+### Log Ingestion Verification
 
-Accessed the blob successfully without authentication, confirming the container was publicly accessible.
+#### Confirmed that diagnostic settings were sending:
 
-Refreshed the blob multiple times to generate repeated anonymous read events.
+- StorageBlobLogs
+- StorageRead
+- StorageWrite
 
-Observation: Anonymous access does not require SAS tokens, keys, or Azure AD credentials.
-
-3. Log Ingestion Verification
-Confirmed that diagnostic settings were sending:
-
-StorageBlobLogs
-
-StorageRead
-
-StorageWrite
-
-Waited 2–5 minutes for ingestion.
-
+Waited 2–5 minutes for ingestion
 Verified that anonymous access events appeared in StorageBlobLogs.
 
-Fields of interest:
+#### Fields of interest:
 
-AuthenticationType == "Anonymous"
+- AuthenticationType == "Anonymous"
+- OperationName == "GetBlob"
+- CallerIpAddress
+- Uri
 
-OperationName == "GetBlob"
+### KQL Queries Used
 
-CallerIpAddress
+#### Anonymous Access Detection
 
-Uri
-
-4. KQL Queries Used
-Anonymous Access Detection
-kusto
 StorageBlobLogs
 | where AuthenticationType == "Anonymous"
 | summarize AccessCount = count(), Blobs = make_set(Uri, 10)
     by CallerIpAddress, bin(TimeGenerated, 1h)
-Container Enumeration Detection
-kusto
+
+#### Screenshot of Anonymous access KQL query and results
+![anonymousaccess](./screenshots/filename.png)
+
+#### Container Enumeration Detection
+
 StorageBlobLogs
 | where Uri contains "comp=list"
 | summarize ListOperations = count()
     by CallerIpAddress, bin(TimeGenerated, 1h)
-High‑Volume Anonymous Reads
-kusto
+
+#### Screenshot of Container listing KQL query and results
+![containerlisting](./screenshots/filename.png)
+
+#### High Volume Anonymous Reads
+
 StorageBlobLogs
 | where AuthenticationType == "Anonymous"
 | summarize TotalReads = count()
     by bin(TimeGenerated, 1h)
 | where TotalReads > 20
-5. Findings
-Anonymous blob access was successfully logged.
 
-All access originated from the expected test IP address.
+#### Screenshot of High‑volume access detection results
+![highvolumeaccess](./screenshots/filename.png)
 
-Container listing operations (comp=list) were captured, showing that public access allowed enumeration of blob contents.
+### Findings
 
-High‑volume reads were detected during testing, confirming that repeated anonymous access is fully logged.
+- Anonymous blob access was successfully logged.
+- All access originated from the expected test IP address.
+- Container listing operations (comp=list) were captured, showing that public access allowed enumeration of blob contents.
+- High volume reads were detected during testing, confirming that repeated anonymous access is fully logged.
+- No unexpected IPs or suspicious access patterns were observed.
 
-No unexpected IPs or suspicious access patterns were observed.
+### Commentary
+Azure logs anonymous access clearly, including the caller IP, timestamp, and blob URI. This is essential for forensic investigations, especially when dealing with misconfigurations that expose data publicly. The behaviour observed in this lab matches real‑world cloud incidents where public containers lead to data exposure. Anonymous reads, container listings, and repeated access attempts were all captured as expected. This demonstrates that Azure provides sufficient telemetry to detect misconfigurations, provided diagnostic settings are correctly configured. 
 
-6. Analyst Commentary
-Azure logs anonymous access clearly, including the caller IP, timestamp, and blob URI. This is essential for forensic investigations, especially when dealing with misconfigurations that expose data publicly.
-
-The behaviour observed in this lab matches real‑world cloud incidents where public containers lead to data exposure. Anonymous reads, container listings, and repeated access attempts were all captured as expected. This demonstrates that Azure provides sufficient telemetry to detect misconfigurations, provided diagnostic settings are correctly configured.
-
-7. Expected Behaviour Notes
-Anonymous access always logs in StorageBlobLogs when diagnostic settings are enabled.
-
-If the blob is later deleted, the deletion event is still logged.
-
-Any attempt to access a deleted blob returns HTTP 404 (Not Found), which is expected.
-
-Public access should never be enabled in production unless explicitly required.
