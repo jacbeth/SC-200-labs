@@ -1,6 +1,5 @@
 # Lab 3 — Threat Detection Notes
-
-These notes document the execution of Lab 3, including screenshots, observations, and commentary. T
+These notes document the execution of Lab 3, including screenshots, observations, and commentary. 
 
 ## Environment Setup & Log Generation
 
@@ -10,39 +9,34 @@ These notes document the execution of Lab 3, including screenshots, observations
 - Generated a SAS token and accessed blobs using SAS
 - Deleted a few blobs to generate DeleteBlob events
 
-### Why this matters
+### Important
 StorageBlobLogs only populate when real blob operations occur. AzureActivity logs provide context around SAS creation, key regeneration, RBAC changes, etc.
 
 ### 📦 Verification of Log Ingestion
 Before running detections, I confirmed that both required log sources were flowing into my Sentinel workspace.
 
-### Queries Run and Screenshots
-
-#### Queries
+### Queries Run
 StorageBlobLogs
 | limit 10
 
 AzureActivity
 | limit 10
 
-#### Screenshot
+#### Screenshot of Blob query
 ![StorageBlobLogs verification](./screenshots/1-storagebloblogs-query.png)
 
-#### Screenshot
+#### Screenshot of AzureActivity query
 ![Azure Activity verification](./screenshots/2-azureactivity-query.png)
 
 ### Tables List Verification
+Located at Microsoft Sentinel → Logs, left side panel shows every table currently available in the Log Analytics workspace.
 
-#### Location
-Microsoft Sentinel → Logs, left side panel shows every table currently available in the Log Analytics workspace.
-
-#### Tableslist
+#### Screenshot of Tableslist
 ![Tables](./screenshots/3-tableslist.png)
 
 Both tables appear in the workspace: StorageBlobLogs and AzureActivity. This validates that the environment is ready for detection engineering.
 
 ## 🔍 Detection 1 — Repeated Blob Downloads from the Same IP
-
 Detects repeated blob downloads from the same IP address within a 15‑minute window. High‑frequency access may indicate automation, credential misuse, or early‑stage data exfiltration.
 
 KQL Query:
@@ -61,7 +55,7 @@ StorageBlobLogs
 
 ### Execution Evidence
 
-#### Query execution/results
+#### Screenshot of query execution/results
 ![query_results](./screenshots/4-detection1-query-results.png)
 
 ### Findings
@@ -71,11 +65,9 @@ IPs exceeded threshold 92.40.169.163. This was expected as the result of simulat
 A sudden spike in blob downloads is a classic early indicator of data harvesting. Attackers often begin by quietly pulling data before escalating. 
 
 ### MITRE Mapping
-Tactic - Exfiltration (TA0010) 	Technique -Exfiltration Over Web Services (T1567)
+Tactic: Exfiltration (TA0010) 	Technique: Exfiltration Over Web Services (T1567)
 	
-
 ## 🔍 Detection 2 — Blob Access from Unusual or Non‑Corporate IP Ranges
-
 Detects blob access originating from IP addresses outside expected private or corporate ranges.
 
 KQL Query:
@@ -96,7 +88,7 @@ StorageBlobLogs
 
 ### Execution Evidence
 
-#### Query execution/results
+#### Screenshot of query execution/results
 ![detection2](./screenshots/6-detection2-query-results.png)
 
 ### Findings
@@ -104,15 +96,14 @@ External IPs accessed blobs - 92.40.169.164 and 195.149.13.240
 Results were as expected and triggered by accessing blob multiple times on my home network
 
 ### Commentary
-Unexpected IPs are a strong indicator of credential compromise, SAS token leakage, or external reconnaissance. This detection becomes extremely powerful when enriched with geo‑location or threat intelligence feeds.
+Unexpected IPs are a strong indicator of credential compromise, SAS token leakage, or external reconnaissance. 
 
 ### MITRE Mapping
-Tactic - Initial Access (TA0001)  Technique - Valid Accounts (T1078)
+Tactic: Initial Access (TA0001)  Technique: Valid Accounts (T1078)
 
 
 ## 🔍 Detection 3 — Blob Access Using SAS Tokens
-
-Identifies blob access authenticated using SAS tokens. SAS tokens are high‑risk if leaked because they grant scoped access without requiring credentials.
+Identifies blob access authenticated using SAS tokens. SAS tokens are high risk if leaked because they grant scoped access without requiring credentials.
 
 KQL Query:
 
@@ -128,7 +119,7 @@ StorageBlobLogs
 
 ### Execution Evidence
 
-#### Query execution/results
+#### Screenshot of query execution/results
 ![detection3](./screenshots/7-detection3-query-results.png)
 
 
@@ -148,40 +139,39 @@ The presence of container listing operations (comp=list) confirms that the SAS t
 The results show a clear pattern of SAS token usage from a single client machine. The repeated access counts (e.g., 39, 64, 65 operations) are consistent with intentional testing, such as repeatedly downloading blobs or refreshing SAS URLs. The fact that the same IP appears with different source ports is normal — each HTTP request uses a new ephemeral port. This confirms the activity is legitimate and not indicative of distributed or automated external scanning.
 
 ### MITRE Mapping 
-Tactic: Defense Evasion (TA0005) Technique: Use of Credentials (T1550)
-	
+Tactic: Defense Evasion (TA0005) Technique: Use of Credentials (T1550)	
 
 ## 🔍 Detection 4 — Blob Deletions (DeleteBlob)
-
 Detects blob deletions, which may indicate destructive behaviour or cleanup after exfiltration.
 
 KQL Query:
 
 StorageBlobLogs
 | where OperationName == "DeleteBlob"
-| summarize DeleteCount = count(), DeletedBlobs = make_set(Uri, 10)
-    by CallerIpAddress, CallerAccountName, bin(TimeGenerated, 1h)
+| summarize 
+    DeleteCount = count(),
+    DeletedBlobs = make_set(Uri, 10)
+    by CallerIpAddress, bin(TimeGenerated, 1h)
 
-#### Explanation
+### Explanation
 - Filters for blob deletion operations
 - Groups deletions by IP, account, and time window
 - Captures a sample of deleted blob URIs
 
 ### Execution Evidence
 
-![description](./screenshots/filename.png)
-Query execution
+![deleteblob](./screenshots/8-detection4-query-results.png)
 
-Results showing deleted blobs
+### ⭐ Findings
 
-Any correlation with earlier detections
+- Blob deletion activity was successfully captured in StorageBlobLogs using the KQL query.
+- The deleted blob continued to generate log entries, confirming that deletion operations are fully logged even after the file no longer exists.
+- Attempts to access the blob using the previous SAS URL resulted in HTTP 404 (Not Found), which is expected behaviour once the object has been deleted.
+- All deletion activity originated from the same public IP address, with no evidence of unauthorised access or unexpected clients.
 
-#### Findings
-Document which blobs were deleted, who performed the deletion, and whether it was authorised.
+###  Commentary
+The results show normal, controlled behaviour consistent with intentional testing. All deletions came from a single IP address and targeted specific blobs, with no signs of enumeration, mass deletion, or access from unknown sources. This confirms that the SAS token and blob deletion operations behaved as expected within the lab environment.
 
-#### Analyst Commentary
-Blob deletion is a high‑impact action. It may indicate malicious cleanup after data theft, insider threat activity, or compromised credentials performing destructive operations. This detection is essential for both security and operational monitoring.
+### MITRE Mapping
+Tactic:	Impact (TA0040)	Technique: Data Destruction (T1485)
 
-MITRE Mapping
-Tactic	Technique
-Impact (TA0040)	Data Destruction (T1485)
