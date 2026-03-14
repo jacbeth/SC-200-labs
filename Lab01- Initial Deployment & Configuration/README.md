@@ -115,6 +115,7 @@ KQL query used to validate ingestion:
 ```kql
 union SigninLogs, AuditLogs, AzureActivity
 | summarize LastEvent = max(TimeGenerated) by Type
+```
 
 ---
 
