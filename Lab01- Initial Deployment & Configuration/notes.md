@@ -1,57 +1,63 @@
-## Notes
+# Notes – Microsoft Sentinel Deployment & Initial Configuration
 
-### Microsoft Sentinel is now managed through the Microsoft Defender portal rather than exclusively through the Azure portal.
-This reflects Microsoft's transition toward a unified security operations platform.
+## 1. Platform Transition
+Microsoft Sentinel is now managed through the **Microsoft Defender portal** rather than exclusively through the Azure portal.  
+This reflects Microsoft’s shift toward a unified security operations platform that consolidates SIEM, XDR, and identity telemetry.
 
-### Data Connectors and Log Ingestion
+---
 
-Security data ingestion relies on configuring data connectors that send logs to the Log Analytics Workspace.
+## 2. Data Connectors & Log Ingestion
+Security data ingestion relies on configuring **data connectors** that send logs directly to the Log Analytics Workspace (LAW).
 
 Identity and security sources such as:
+- Microsoft Entra ID  
+- Microsoft Defender XDR  
+- Azure Activity  
 
-Microsoft Entra ID
+…send logs **natively** to the workspace and do **not** require resource‑level diagnostic settings.
 
-Microsoft Defender XDR
+---
 
-Azure Activity
+## 3. Diagnostic Settings
+Diagnostic settings were **not enabled** in this lab because the primary data sources were identity and Defender telemetry.
 
-send logs directly to the workspace without requiring resource-level diagnostic settings.
+Diagnostic settings are typically required for Azure resource logs such as:
+- Virtual machines  
+- Storage accounts  
+- Azure Key Vault  
+- Network security devices  
 
-### Diagnostic Settings
+These resources send logs to LAW via diagnostic pipelines.
 
-Resource-level diagnostic settings were not enabled in this lab because the primary data sources are identity and Defender telemetry. Diagnostic settings are typically required when collecting logs from Azure resources such as: virtual machines, storage accounts, Azure Key Vault and network security devices
+---
 
-These resources send logs to the workspace via diagnostic pipelines.
+## 4. Analytics Rule Templates
+Installing security solutions from the **Content Hub** populates the Analytics Rule Templates section.
 
-### Analytics Rule Templates
+Important note:
+- Templates **do not generate alerts** until converted into **active analytics rules**.
 
-Installing security solutions from the Content Hub populates analytics rule templates. Templates do not generate alerts until they are converted into active analytics rules.
+---
 
-## RBAC Configuration
+## 5. RBAC Configuration
+Role‑based access control was configured to support **least‑privilege access** for SOC analysts.
 
-Role-based access control was configured to support least-privilege access for SOC analysts.
-
-Roles assigned included:
-
-- Sentinel Contributor
-
-- Log Analytics Reader
-
-- Security Reader
+Roles assigned:
+- **Sentinel Contributor** – manage detection and incident workflows  
+- **Log Analytics Reader** – query and analyse logs  
+- **Security Reader** – view alerts and security posture  
 
 ### Elevated Access Warning
+Azure displayed a notification indicating that **elevated access** had been enabled at the tenant level.  
+This occurs when administrators temporarily enable root‑level permissions to assign roles.  
+The permission can be disabled once configuration is complete.
 
-During RBAC configuration, Azure displayed a notification indicating that elevated access had been enabled at the tenant level.
+---
 
-This occurs when administrators temporarily enable root-level permissions to manage role assignments. The permission can be disabled once required roles are configured.
+## 6. Log Ingestion Validation
+Log ingestion was validated using KQL queries in the workspace.
 
-## Log Ingestion Validation
-
-Log ingestion was verified using Kusto Query Language queries in the workspace.
-
-Example validation query:
-
-union SigninLogs, AuditLogs, AzureActivity 
-| summarize LastEvent=max(TimeGenerated) by Type
-
-This confirmed that multiple data sources were successfully sending logs.
+Example query:
+```kql
+union SigninLogs, AuditLogs, AzureActivity
+| summarize LastEvent = max(TimeGenerated) by Type
