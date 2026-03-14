@@ -1,10 +1,7 @@
 
 ---
 
-# 📓 **Notes.md – Lab 3: Threat Detection Notes (Rewritten & Polished)**
-
-```markdown
-# Notes – Lab 3: Azure Threat Detection
+## 📓 Lab 3: Threat Detection Notes 
 
 These notes document the execution of Lab 3, including screenshots, observations, and commentary.
 
@@ -30,12 +27,14 @@ AzureActivity logs provide context around SAS creation, key regeneration, RBAC c
 ```kql
 StorageBlobLogs
 | limit 10
+```
 
-
+```kql
 AzureActivity
 | limit 10
+```
 
-Screenshots
+## Screenshots
 StorageBlobLogs verification
 
 AzureActivity verification
@@ -45,28 +44,28 @@ Both tables appeared in the workspace, confirming the environment was ready for 
 3. Detection 1 — Repeated Blob Downloads
 Detects repeated blob downloads from the same IP within a 15‑minute window.
 
-Findings:  
+## Findings:  
 IP 92.40.169.163 exceeded the threshold — expected due to simulated activity.
 
-Commentary:  
+## Commentary:  
 A sudden spike in blob downloads is a classic early indicator of data harvesting.
 
-MITRE:
+## MITRE:
 
 Exfiltration (TA0010)
 
 Exfiltration Over Web Services (T1567)
 
-4. Detection 2 — Blob Access from Unusual IP Ranges
+## 4. Detection 2 — Blob Access from Unusual IP Ranges
 Detects blob access from non‑private IP ranges.
 
-Findings:  
+## Findings:  
 External IPs 92.40.169.164 and 195.149.13.240 accessed blobs — expected from home network testing.
 
-Commentary:  
+## Commentary:  
 Unexpected IPs may indicate credential compromise or SAS token leakage.
 
-MITRE:
+## MITRE:
 
 Initial Access (TA0001)
 
@@ -75,52 +74,45 @@ Valid Accounts (T1078)
 5. Detection 3 — Blob Access Using SAS Tokens
 Identifies blob access authenticated using SAS tokens.
 
-Findings:
+## Findings:
 
-SAS activity originated from a single public IP
+- SAS activity originated from a single public IP
+- Access counts ranged from 1 to 65 per hour
+- Container listing operations confirmed SAS enumeration capability
 
-Access counts ranged from 1 to 65 per hour
-
-Container listing operations confirmed SAS enumeration capability
-
-Commentary:  
+## Commentary:  
 SAS tokens are powerful and risky — any unexpected usage should be treated as a potential incident.
 
-MITRE:
+## MITRE:
 
 Defense Evasion (TA0005)
 
 Use of Credentials (T1550)
 
-6. Detection 4 — Blob Deletions
+## 6. Detection 4 — Blob Deletions
 Detects blob deletions, which may indicate destructive behaviour.
 
-Findings:
+## Findings:
 
-DeleteBlob events captured successfully
+- DeleteBlob events captured successfully
+- Deleted blobs still generated log entries
+- SAS URLs returned 404 after deletion
 
-Deleted blobs still generated log entries
-
-SAS URLs returned 404 after deletion
-
-Commentary:  
+## Commentary:  
 All deletions were controlled and expected — no signs of mass deletion or unauthorised access.
 
-MITRE:
+## MITRE:
 
 Impact (TA0040)
 
 Data Destruction (T1485)
 
-7. Summary
+## 7. Summary
 This lab validated:
 
-StorageBlobLogs ingestion
+- StorageBlobLogs ingestion
+- AzureActivity ingestion
+- Behavioural detections for blob access
+- MITRE‑aligned threat detection logic
 
-AzureActivity ingestion
 
-Behavioural detections for blob access
-
-MITRE‑aligned threat detection logic
-
-The environment is now ready for more advanced detection engineering and threat hunting.
