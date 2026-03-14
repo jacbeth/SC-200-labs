@@ -57,6 +57,7 @@ Exfiltration Over Web Services (T1567)
 
 ## 🔍 Detection 2 — Blob Access from Unusual or Non‑Corporate IP Ranges
 
+```kql
 StorageBlobLogs
 | where OperationName == "GetBlob"
 | where CallerIpAddress !startswith "192.168."
@@ -64,6 +65,7 @@ StorageBlobLogs
     and CallerIpAddress !startswith "172.16."
 | summarize AccessCount = count() by CallerIpAddress, bin(TimeGenerated, 1h)
 | where AccessCount > 0
+``` 
 
 ## Why this matters
 Unexpected IPs may indicate:
