@@ -1,8 +1,6 @@
 
-# 🌐 **README.md – Sentinel Deployment & Configuration (Rewritten & Branded)**
+# 🌐 Sentinel Deployment & Configuration
 
-
-# Lab – Azure Sentinel SOC Lab: Initial Deployment & Configuration
 
 ---
 
