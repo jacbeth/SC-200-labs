@@ -17,47 +17,25 @@ This email is a benign test message sent from a legitimate Gmail account. All au
 
 ### Screenshots
 
-#### SPF Result
-![spf](./screenshots/filename.png)
+#### SPF Result/Sender IP 
+![spf](./screenshots/01-spf-pass.png)
 
-
-
-
+#### DKIM Result
 dkim=pass header.d=gmail.com
+![dkim](./screenshots/02-dkim-pass.png)
 
-
-
+#### DMARC Result 
 dmarc=pass action=none header.from=gmail.com
+![dmarc](./screenshots/03-dmarc-pass.png)
 
+#### Received (Routing Path)
+![received](./screenshots/04-received-routingpath.png)
 
+#### Return‑Path vs From
+![receivedfrom](./screenshots/05-received-from.png)
 
-sender IP is 209.85.218.46
-
-
-
-Received: from mail-ej1-f46.google.com (209.85.218.46)
-
-Received: by CH1PEP0000DA7D.namprd04.prod.outlook.com
-
-Received: by CH2PR03CA0022.outlook.office365.com
-
-
-
-From: Jac <jacbethphill@gmail.com>
-
-smtp.mailfrom=gmail.com
-
-
-
-x-google-dkim-signature: ...
-
-x-gm-message-state: ...
-
-x-gm-features: ...
-
-
-
-
+#### X‑Mailer / X‑Google Metadata
+[xmailer](./screenshots/06-x-mailer.png)
 
 ## 🌐 Infrastructure Findings
 
