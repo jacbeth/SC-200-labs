@@ -1,6 +1,4 @@
-
 # 🌐 Sentinel Deployment & Configuration
-
 
 ---
 

@@ -1,4 +1,4 @@
-# Notes – Microsoft Sentinel Deployment & Initial Configuration
+# Sentinel Deployment & Initial Configuration
 
 ## 1. Platform Transition
 Microsoft Sentinel is now managed through the **Microsoft Defender portal** rather than exclusively through the Azure portal.  
