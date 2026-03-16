@@ -58,7 +58,7 @@ Rules enabled:
 - Threat intelligence‑based rules  
 
 #### Screenshot -  Analytical Rules
-![rulescreated](./screenshots/7- Analytic_rule_creation.png)
+![rulescreated](./screenshots/7-Analytic_rule_creation.png)
 
 ---
 
