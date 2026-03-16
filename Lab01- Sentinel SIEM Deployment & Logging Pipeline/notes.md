@@ -8,14 +8,14 @@ LAW supports:
 - KQL querying  
 - Analytics rule evaluation  
 - Threat hunting  
-### Screenshot
-![law](./screenshots/1- log-analytics-workspace.png)
+### Screenshot showing Log Analytics Workspace
+![law](./screenshots/1-log-analytics-workspace.png)
 
 ---
 
 ## 🛡️ Microsoft Sentinel Deployment
-Sentinel was enabled on the workspace
-### Screenshot
+
+### Screenshot - Sentinel enabled on LAW
 ![sentinel](./screenshots/2-Microsoft-Sentinel-enabled.png)
 
 ---
@@ -27,10 +27,7 @@ The following connectors were successfully configured and verified:
 - Microsoft Entra ID   
 - Microsoft Defender for Office 365  
 
-### Verification
-#### Screenshots
-
-All connectors show **Connected**  
+### Screenshot - data connectors configured
 ![data_connectors](./screenshots/3-Data_connectors.png)
 
 - Sign‑in and audit logs confirmed in LAW  
