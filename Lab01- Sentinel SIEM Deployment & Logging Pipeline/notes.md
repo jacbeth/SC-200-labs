@@ -69,3 +69,11 @@ Roles assigned:
 - **Sentinel Contributor**  
 - **Log Analytics Reader**  
 - **Security Reader**  
+
+## 📊  Workspace Health Validation
+KQL query used to validate ingestion:
+
+```kql
+union SigninLogs, AuditLogs, AzureActivity
+| summarize LastEvent = max(TimeGenerated) by Type
+```
