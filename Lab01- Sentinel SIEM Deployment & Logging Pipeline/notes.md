@@ -40,11 +40,12 @@ Detection content was installed from the Content Hub, populating the **Analytics
 #### Screenshot - Content Hub Installed
 ![contenthub](./screenshots/5-content-hub-installed.png)
 
-**Detection Coverage:** 146 analytics rule templates available.
+#### Screenshot -  146 analytics rule templates available
+![rulesavailable](./screenshots/6-analytics-rule-templates.png)
 
 ---
 
-## ⚠️ Analytics Rules Configuration
+### ⚠️ Analytics Rules Configuration
 Templates do **not** generate incidents until converted into **active rules**.
 
 Rules enabled:
@@ -56,16 +57,15 @@ Rules enabled:
 - Suspicious sign‑in behaviour  
 - Threat intelligence‑based rules  
 
+#### Screenshot -  Analytical Rules
+![rulescreated](./screenshots/7- Analytic_rule_creation.png)
+
 ---
 
-## 🔐 Access Control (RBAC)
+### 🔐 Access Control (RBAC)
 Least‑privilege access was configured on the workspace.
 
 Roles assigned:
 - **Sentinel Contributor**  
 - **Log Analytics Reader**  
 - **Security Reader**  
-
----
-
-#
